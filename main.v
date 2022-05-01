@@ -57,22 +57,6 @@ fn search(board[][] bool, pos VectorInt)int{
 	return find
 }
 
-/* fn search(a voidptr, pos VectorInt)int{
-	mut app := &App(a)
-	mut find := 0
-
-	for j in pos.y-1..pos.y+1 {
-		for i in pos.x-1..pos.x+1{
-			if i < 0 || j < 0 || i >= app.board[0].len || j >= app.board.len {continue}
-			if app.board[j][i] {
-				find++
-			}
-		}
-	}
-
-	return find
-} */
-
 fn frame(a voidptr) {
 	mut app := &App(a)
 	/* elapsed := app.tui.frame_count/f64(fps) */
