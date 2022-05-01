@@ -1,6 +1,7 @@
 import term.ui as tui
 import term
 import time
+import rand
 
 struct App {
 mut:
@@ -41,10 +42,7 @@ fn event(e &tui.Event, x voidptr) {
 }
 
 fn search(board[][] bool, pos VectorInt)int{
-	//mut app := &App(a)
 	mut find := 0
-	//? includes self
-
 	for j in pos.y-1..pos.y+2 {
 		for i in pos.x-1..pos.x+2{
 			if i < 0 || j < 0 || i >= board[0].len || j >= board.len {continue}
@@ -53,7 +51,6 @@ fn search(board[][] bool, pos VectorInt)int{
 			}
 		}
 	}
-
 	return find
 }
 
@@ -94,6 +91,14 @@ fn frame(a voidptr) {
 		}
 	}
 
+	if replenish && app.tui.frame_count % replenish_frame == 0 && !app.paused {
+		for _ in 0..cell_addition {
+			x := rand.int_in_range(0, app.board[0].len) or {panic("uh oh")}
+			y := rand.int_in_range(0, app.board.len)    or {panic("uh oh")}
+			app.board[y][x] = true
+		}1
+	} //? replenish board
+
 	app.tui.flush()
 	if !app.paused {time.sleep(time.millisecond * simulation_ms)}
 	app.tui.clear()
@@ -107,6 +112,10 @@ fn frame(a voidptr) {
 const (
 	fps = 60
 	simulation_ms = 80
+
+	replenish       = true
+	replenish_frame = 60
+	cell_addition   = 400
 )
 
 fn main(){
