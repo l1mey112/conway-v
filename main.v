@@ -95,7 +95,7 @@ fn frame(a voidptr) {
 	}
 
 	app.tui.flush()
-	if !app.paused {time.sleep(time.millisecond * simulation_wait)}
+	if !app.paused {time.sleep(time.millisecond * simulation_ms)}
 	app.tui.clear()
 }
 
