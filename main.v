@@ -1,7 +1,6 @@
 import term.ui as tui
 import term
 import time
-import math
 
 struct App {
 mut:
@@ -10,7 +9,6 @@ mut:
 	pos VectorInt
 
 	paused bool = true
-
 	board[][] bool
 }
 
@@ -23,27 +21,22 @@ fn event(e &tui.Event, x voidptr) {
 				exit(0)
 			}
 		}
-		if e.modifiers.has(.shift) {
-
-		}
-		if e.modifiers.has(.alt) {
-
-		}
-	}
+	} //? ctrl-c for exit
 
 	if e.typ == .mouse_move {
 		app.pos = VectorInt{e.x, e.y}
 	}
-	if e.typ == .mouse_down && e.button == .left{
-		app.mouse_down = true
-	}
-	if e.typ == .mouse_down && e.button == .right{
-		app.mouse_down = false
-	}
-
 	if e.typ == .key_down && e.code == .enter {
 		app.paused = !app.paused
 		app.mouse_down = false
+	}
+	if e.typ == .mouse_down {
+		if e.button == .left{
+			app.mouse_down = true
+		}
+		if e.button == .right{
+			app.mouse_down = false
+		}
 	}
 }
 
@@ -80,14 +73,6 @@ fn search(board[][] bool, pos VectorInt)int{
 	return find
 } */
 
-fn ruint(v f64)u8{
-	return u8(math.round(v))
-}
-
-fn mapf(old_min f64, old_max f64, new_min f64, new_max f64, value f64)f64{
-	return new_min + ((new_max-new_min)/(old_max-old_min)) * (math.clamp(value, old_min, old_max))
-}
-
 fn frame(a voidptr) {
 	mut app := &App(a)
 	/* elapsed := app.tui.frame_count/f64(fps) */
@@ -98,26 +83,21 @@ fn frame(a voidptr) {
 	}
 
 	//? iterate
-	
 	temp := app.board
 	for j in 0..app.board.len {
 		for i in 0..app.board[0].len  {
 			if !app.paused {
 				neighbours := search(temp, VectorInt{i, j})
-
-				if neighbours == 3 && temp[j][i] == false{
+				if neighbours == 3 && !temp[j][i]{
 					app.board[j][i] = true
-				}
-				if (neighbours == 2 || neighbours == 3) && temp[j][i]{
-					//? live
-				}else if neighbours < 2 && temp[j][i]{
+				} else if neighbours < 2 && temp[j][i]{
 					app.board[j][i] = false
 				} else if neighbours > 3 && temp[j][i]{
 					app.board[j][i] = false
 				}
 			}
 
-			if app.board[j][i] == false {continue}
+			if !app.board[j][i] {continue}
 			app.tui.set_cursor_position(i,j)
 			if app.paused { app.tui.write(term.red("█")) } else {
 				app.tui.set_color(tui.Color{
@@ -131,7 +111,7 @@ fn frame(a voidptr) {
 	}
 
 	app.tui.flush()
-	if !app.paused {time.sleep(time.millisecond * 80)}
+	if !app.paused {time.sleep(time.millisecond * simulation_wait)}
 	app.tui.clear()
 }
 
@@ -142,6 +122,7 @@ fn frame(a voidptr) {
 
 const (
 	fps = 60
+	simulation_ms = 80
 )
 
 fn main(){
